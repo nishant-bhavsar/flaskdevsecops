@@ -1,0 +1,68 @@
+# DevSecOps Pipeline for Hello World Flask App
+
+A complete, production-grade DevSecOps pipeline that builds, scans, tests, and publishes a Dockerized Python Flask "Hello World" application via GitHub Actions.
+
+## Proposed Changes
+
+### Flask Application
+
+#### [NEW] [app.py](file:///e:/Project/base/app.py)
+Minimal Flask app returning `"Hello, World!"` on `/` and a JSON health endpoint on `/health`.
+
+#### [NEW] [requirements.txt](file:///e:/Project/base/requirements.txt)
+Pinned dependencies: `flask`, `gunicorn`.
+
+#### [NEW] [tests/test_app.py](file:///e:/Project/base/tests/test_app.py)
+Pytest-based unit tests for both routes (`/` and `/health`).
+
+---
+
+### Docker
+
+#### [NEW] [Dockerfile](file:///e:/Project/base/Dockerfile)
+Multi-stage build with security best practices:
+- **Stage 1 – Builder**: install dependencies in a venv.
+- **Stage 2 – Runtime**: `python:3.12-slim`, non-root user, copy venv, expose port 5000, run via Gunicorn.
+
+#### [NEW] [.dockerignore](file:///e:/Project/base/.dockerignore)
+Exclude `.git`, `__pycache__`, `.github`, tests, etc.
+
+---
+
+### GitHub Actions DevSecOps Pipeline
+
+#### [NEW] [devsecops.yml](file:///e:/Project/base/.github/workflows/devsecops.yml)
+
+Pipeline triggers on **push** and **pull_request** to `main`. Stages:
+
+| Stage | Tool | Purpose |
+|---|---|---|
+| **Lint** | `flake8` | PEP-8 code style |
+| **SAST** | `bandit` | Static security analysis |
+| **Unit Tests** | `pytest` + coverage | Functional correctness |
+| **Dependency Scan** | `pip-audit` | Known CVEs in deps |
+| **Docker Build** | `docker build` | Build container image |
+| **Image Scan** | `trivy` | CVEs in container image |
+| **Push to GHCR** | `docker/login-action` + `docker/build-push-action` | Publish to GitHub Container Registry (on `main` push only) |
+
+---
+
+### Supporting Files
+
+#### [NEW] [.gitignore](file:///e:/Project/base/.gitignore)
+Standard Python `.gitignore`.
+
+#### [NEW] [README.md](file:///e:/Project/base/README.md)
+Project overview, local run instructions, pipeline diagram.
+
+## Verification Plan
+
+### Automated Tests
+1. **Syntax check** – `python -m py_compile app.py` to confirm no syntax errors.
+2. **Pytest** – `pytest tests/ -v` to confirm both routes pass.
+3. **Flake8** – `flake8 app.py tests/` to confirm linting passes.
+4. **Bandit** – `bandit -r app.py` to confirm no security issues.
+5. **YAML lint** – Validate `.github/workflows/devsecops.yml` with `python -c "import yaml; yaml.safe_load(open(...))"`.
+
+### Manual Verification
+- Push the repo to GitHub and confirm the Actions workflow runs green in the **Actions** tab.

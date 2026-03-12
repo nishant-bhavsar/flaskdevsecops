@@ -1,0 +1,7 @@
+# Development / CI dependencies
+-r requirements.txt
+pytest==8.3.4
+pytest-cov==6.0.0
+flake8==7.1.1
+bandit==1.8.3
+pip-audit==2.7.3
