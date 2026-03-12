@@ -16,7 +16,7 @@ RUN python -m venv /opt/venv \
 FROM python:3.12-slim AS runtime
 
 LABEL maintainer="nishantbhvsr@gmail.com"
-LABEL org.opencontainers.image.source="https://github.com/nb/flaskdevsecops"
+LABEL org.opencontainers.image.source="https://github.com/nishant-bhavsar/flaskdevsecops"
 
 # Security: run as non-root
 RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /sbin/nologin appuser
